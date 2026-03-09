@@ -1,41 +1,36 @@
-# 💭 Reflection: Game Glitch Investigator
+# 💭 Reflection: Game Glitch Investigator  
+---
 
-Answer each question in 3 to 5 sentences. Be specific and honest about what actually happened while you worked. This is about your process, not trying to sound perfect.
+## **1. What was broken when you started?**
 
-## 1. What was broken when you started?
-
-- What did the game look like the first time you ran it?
-- List at least two concrete bugs you noticed at the start  
-  (for example: "the hints were backwards").
+When I first ran the game, the UI loaded correctly, but the gameplay behavior was inconsistent. The most noticeable issue was that the hint system was unreliable — sometimes a guess that was clearly lower than the secret number produced a “Too high” message. I also noticed that the score counter behaved strangely, occasionally decreasing twice or not updating at all. In one run, the game didn’t end even after I guessed the correct number, which suggested a logic issue in how the win condition was handled. These bugs made it clear that both the hint logic and the game flow needed investigation.
 
 ---
 
-## 2. How did you use AI as a teammate?
+## **2. How did you use AI as a teammate?**
 
-- Which AI tools did you use on this project (for example: ChatGPT, Gemini, Copilot)?
-- Give one example of an AI suggestion that was correct (including what the AI suggested and how you verified the result).
-- Give one example of an AI suggestion that was incorrect or misleading (including what the AI suggested and how you verified the result).
+I used GitHub Copilot inside VS Code as my main AI assistant, and I also used Copilot Chat for deeper explanations of the logic. One correct suggestion Copilot gave was to move the `check_guess` function out of `app.py` and into `logic_utils.py` to separate UI from logic. After applying this refactor, I verified the change by running pytest and confirming that the logic behaved consistently in the Streamlit app.  
 
----
-
-## 3. Debugging and testing your fixes
-
-- How did you decide whether a bug was really fixed?
-- Describe at least one test you ran (manual or using pytest)  
-  and what it showed you about your code.
-- Did AI help you design or understand any tests? How?
+One misleading suggestion Copilot gave was to rewrite the entire scoring system using a more complex state object. The diff it generated touched multiple files unnecessarily and introduced new bugs. I caught this by reviewing the diff carefully and noticing that the logic no longer matched the game’s intended behavior. I discarded the suggestion and instead asked Copilot for a smaller, targeted fix, which worked correctly.
 
 ---
 
-## 4. What did you learn about Streamlit and state?
+## **3. Debugging and testing your fixes**
 
-- How would you explain Streamlit "reruns" and session state to a friend who has never used Streamlit?
+To decide whether a bug was truly fixed, I combined automated tests with manual gameplay. After fixing the hint logic, I wrote a pytest test that checked whether a guess of 60 against a secret of 50 returned “Too high.” The test passed, and when I ran the game manually, the hints matched my expectations across multiple guesses.  
+
+AI helped me design the test by suggesting a simple structure for verifying the output of `check_guess`. Copilot also helped me understand how to isolate the logic so the test didn’t depend on Streamlit’s UI state. This combination of automated and manual testing gave me confidence that the fix was stable.
 
 ---
 
-## 5. Looking ahead: your developer habits
+## **4. What did you learn about Streamlit and state?**
 
-- What is one habit or strategy from this project that you want to reuse in future labs or projects?
-  - This could be a testing habit, a prompting strategy, or a way you used Git.
-- What is one thing you would do differently next time you work with AI on a coding task?
-- In one or two sentences, describe how this project changed the way you think about AI generated code.
+Streamlit reruns the entire script from top to bottom every time a user interacts with the app, which can be surprising if you’re used to traditional web frameworks. To keep values from resetting on every rerun, Streamlit uses `st.session_state`, which acts like a small dictionary that survives between reruns. I would explain it to a friend like this: “Streamlit refreshes constantly, so session state is where you store anything you don’t want to lose — like the secret number, the score, or whether the game is over.”
+
+---
+
+## **5. Looking ahead: your developer habits**
+
+One habit I want to reuse is writing a small test immediately after fixing a bug. It forced me to think clearly about what the function should do and gave me a reliable way to confirm the fix. Another habit I want to keep is reviewing Copilot’s diffs carefully instead of accepting large changes automatically.  
+
+Next time I work with AI on a coding task, I’ll be more specific in my prompts so the AI focuses on the smallest possible change instead of rewriting entire sections. This project showed me that AI‑generated code can be helpful, but it still needs human judgment — especially when debugging or refactoring logic.
